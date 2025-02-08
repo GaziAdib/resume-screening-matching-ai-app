@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Category Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1F1F1F;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .resume-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .resume-card {
+            background-color: #2C2C2C;
+            padding: 20px;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .resume-card:hover {
+            transform: scale(1.05);
+        }
+
+        h1, h2 {
+            color: #FFD700;
+        }
+
+        .keyword-item {
+            display: inline-block;
+            background-color: #3b3b3b;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 14px;
+            color: #fff;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Resume Screening AI-based System</h1>
+        <p>This system supports TXT and PDF files for:</p>
+        <ul>
+            <li>Resume Categorization</li>
+            <li>Resume Job Recommendation</li>
+            <li>Resume Parsing (Information Extraction)</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>HR: Enter Job Requirements</h2>
+        <form action="/pred" method="post" enctype="multipart/form-data">
+            <textarea name="job_requirements" placeholder="Enter job description here..." required></textarea>
+            <h2>Upload Candidate Resumes</h2>
+            <input type="file" name="resumes" accept=".pdf,.txt,.png,.jpg,.jpeg" multiple required>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    {% if results %}
+    <div class="resume-container">
+        {% for result in results %}
+        <div class="resume-card">
+            <h2>{{ result.name }}</h2>
+            <p><strong>Phone:</strong> {{ result.phone }}</p>
+            <p><strong>Email:</strong> {{ result.email }}</p>
+            <p><strong>Category:</strong> {{ result.predicted_category }}</p>
+            <p><strong>Recommended Job:</strong> {{ result.recommended_job }}</p>
+            <p><strong>Matching Score:</strong> {{ result.matched_percentage }}%</p>
+            
+            {% if result.extracted_skills %}
+            <p><strong>Skills:</strong></p>
+            <ul>
+                {% for skill in result.extracted_skills %}
+                <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            
+            {% if result.extracted_education %}
+            <p><strong>Education:</strong></p>
+            <ul>
+                {% for edu in result.extracted_education %}
+                <li>{{ edu }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if result.matched_keywords %}
+            <p><strong>Matching Keywords:</strong></p>
+            <div>
+                {% for keyword in result.matched_keywords %}
+                <span class="keyword-item">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if highest_matched_files %}
+            <p><strong>Matching Files names:</strong></p>
+            <div>
+                {% for filename in highest_matched_files %}
+                    <span class="keyword-item">{{ filename }}</span>
+                {% endfor %}
+            </div>
+    {% endif %}
+</body>
+</html>
