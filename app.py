@@ -31,7 +31,7 @@ def pdf_to_text(file):
         return None
 
 
-# Clean resume==========================================================================================================
+# Clean resume text by image, pdf or user text
 def cleanResume(txt):
     cleanText = re.sub('http\S+\s', ' ', txt)
     cleanText = re.sub('RT|cc', ' ', cleanText)
@@ -50,7 +50,7 @@ def predict_category(resume_text):
     predicted_category = rf_classifier_categorization.predict(resume_tfidf)[0]
     return predicted_category
 
-#prediction and Category Name
+#ml based job recommendations
 def job_recommendation(resume_text):
     resume_text = cleanResume(resume_text)
     resume_tfidf = tfidf_vectorizer_job_recommendation.transform([resume_text])
@@ -58,6 +58,7 @@ def job_recommendation(resume_text):
     return recommended_job
 
 
+# extracted contact number from pdfs, images or docs
 def extract_contact_number_from_resume(text):
     contact_number = None
 
@@ -68,10 +69,12 @@ def extract_contact_number_from_resume(text):
         contact_number = match.group()
 
     return contact_number
+
+# extracted email number from pdfs, images or docs
 def extract_email_from_resume(text):
     email = None
 
-    # Use regex pattern to find a potential email address
+    # regex pattern for email address
     pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
     match = re.search(pattern, text)
     if match:
@@ -79,6 +82,8 @@ def extract_email_from_resume(text):
 
     return email
 
+
+# extracted skills number from pdfs, images or docs
 def extract_skills_from_resume(text):
     # List of predefined skills
     skills_list = [
@@ -181,6 +186,7 @@ def extract_skills_from_resume(text):
     return skills
 
 
+# extracted educations from pdfs, images or docs
 def extract_education_from_resume(text):
     education = []
 
@@ -220,6 +226,17 @@ def extract_education_from_resume(text):
 
     return education
 
+# extracted names from pdfs, images or docs
+def extract_name_from_resume(text):
+    name = None
+
+    # Use regex pattern to find a potential name
+    pattern = r"(\b[A-Z][a-z]+\b)\s(\b[A-Z][a-z]+\b)"
+    match = re.search(pattern, text)
+    if match:
+        name = match.group()
+
+    return name
 
 # if user upload an image as input 
 def image_to_text(file):
@@ -233,18 +250,8 @@ def image_to_text(file):
         print(f"Error processing image: {e}")
         return ""
 
-def extract_name_from_resume(text):
-    name = None
 
-    # Use regex pattern to find a potential name
-    pattern = r"(\b[A-Z][a-z]+\b)\s(\b[A-Z][a-z]+\b)"
-    match = re.search(pattern, text)
-    if match:
-        name = match.group()
-
-    return name
-
-
+# using cosine similarity to find matching keywords from job description and pdfs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -260,8 +267,9 @@ STOPWORDS = set([
     "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
 ])
 
-# job matching logics
 
+
+# job matching logics
 def job_matched(resume_text, job_requirements):
     """
     Analyzes the similarity between a user's resume and job requirements.
@@ -312,6 +320,8 @@ def resume():
     return render_template('resume.html')
 
 
+
+# our main api for prediction, parsing, matching, summarising etc
 @app.route('/pred', methods=['POST'])
 def pred():
     if 'resumes' in request.files:
@@ -375,15 +385,3 @@ def pred():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-# Laravel
-# Django
-# MySQL
-# MongoDB
-# Firebase
-# react,
-# js,
-# nextjs,
-# redux,
-# node    
